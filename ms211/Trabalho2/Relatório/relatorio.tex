@@ -1,0 +1,125 @@
+\documentclass{coursepaper}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{amsmath}
+\usepackage{listings,lstautogobble}
+\usepackage{bbm}
+
+\author{Eduardo Parducci, Lucas Koiti}
+\title{Projeto Computacional 2 - Diferenças Finitas}
+\author{Eduardo Parducci 170272\\Lucas Koiti 182579}
+\studentnumber{ }
+\instructor{Prof. Aurelio Oliveira}
+\coursename{Cálculo numérico}
+\coursenumber{MS211}
+\coursesection{ D}
+\college{UNICAMP}
+\date{20 de Junho de 2017}
+
+\begin{document}
+
+    \maketitle
+
+    \section{Introdução}
+        \paragraph{}
+            Implementaremos o método de Diferenças finitas para resolver uma EDO dado um problema de valor de contorno (PVC) linear utilizando como aproximação para $y\prime\prime$ e $y\prime$ o método de diferenças centradas.
+    \newpage
+    \section{Desenvolvimento}
+        \paragraph{}
+            Considerando o seguinte problema de valor de contorno (PVC):\\ \\
+            \begin{equation}
+                \begin{cases}
+                    y\prime\prime+xy\prime+y &= 2x\\
+                    y(0) &= 1\\
+                    y(1) &= 0
+                \end{cases}
+            \end{equation}
+        \paragraph{}
+            Iremos implementar o método das diferenças finitas em função de um valor para $h$. Sabemos que, $h = \frac{1}{n}$ no intervalo $[a,b] = [0,1]$, Dessa forma conhecemos $y(x_{0}) = y(0)$ e $y(x_{n}) = y(1)$.
+        \paragraph{}
+            Como aproximação de $y\prime\prime$ e $y\prime$, temos, pelo método de diferenças centradas:
+            \begin{align}
+                y\prime\prime(x_{i}) = \frac{y_{i+1} - 2y_{i} + y_{i-1}}{h^2} &&
+                y\prime(x_{i}) = \frac{y_{i+1} - y_{i-1}}{2h}
+            \end{align}
+        \paragraph{}
+            Reescrevendo a equação (1) utilizando as substituições da equação (2), obtemos:
+            \begin{equation}
+                \frac{y_{i+1} - 2y_{i} + y_{i-1}}{h^2} + \frac{x_{i} y_{i+1} - y_{i-1}}{2h} + y_{i} = 2x_{i}
+            \end{equation}
+        \paragraph{}
+            Note que $x_{i} = x_{0} + ih$, como $x_{0} = 0$ temos $x_{i} = ih$. Multiplicando a equação (3) por $h^2$ e substituindo $x_{i}=ih$ temos:
+            \begin{equation*}
+                y_{i+1} - 2y_{i} + y_{i-1} + \frac{ih^2 y_{i+1}}{2} - \frac{ih^2 y_{i-1}}{2} + h^2y_{i} = 2ih^3
+            \end{equation*}
+        \paragraph{}
+            Agrupando os termos obtemos:
+            \begin{equation}
+                (1+\frac{ih^2}{2})y_{i+1} + (1-\frac{ih^2}{2})y_{i-1} + (h^2-2)y_{i} = 2ih^3
+            \end{equation}
+        \paragraph{}
+            Substituindo os valores iniciais de $y_{0} = 1$ e $y_{1} = 0$ nas iterações $i=1$ e $i=n-1$ respectivamente, obtemos o seguinte sistema de equações:\\ \\
+
+            \begin{equation}
+                \begin{cases}
+                    \left(1+\frac{h^2}{2}\right)y_{2} + (h^2-2)y_{1} &= 2h^3 + \frac{h^2}{2} -1\\ \\
+                    \left(1+\frac{ih^2}{2}\right)y_{i+1} + \left(1-\frac{ih^2}{2}\right)y_{i-1} + (h^2-2)y_{i} &= 2ih^3\\ \\
+                    \left(1-\frac{(n-1)h^2}{2}\right)y_{n-2} + (h^2-2)y_{n-1} &= 2(n-1)h^3
+                \end{cases}
+            \end{equation}
+
+        \section{Resolução}
+
+        \paragraph{}
+            Note que podemos reescrever o sistema de equações (5) de forma matricial com ordem $(n-1)$, na forma AX = B, onde a matriz dos coeficientes (A) é dada por:
+
+            \begin{equation*}
+			\begin{bmatrix}
+				d_{1}  & c_{1}  & 0  & \cdots & \cdots & 0 \\
+				a_{2}  & d_{2}  & c_{2}  && & \vdots \\
+				\vdots & \ddots & \ddots & \ddots &  & \vdots \\
+				\vdots & & \ddots & \ddots & \ddots& \vdots\\
+				\vdots  & & & a_{n-2}  & d_{n-2}  &  c_{n-2}\\
+				0 & \cdots & \cdots & 0 & a_{n-1} & d_{n-1}  \\
+			\end{bmatrix}
+			\end{equation*}
+
+        \paragraph{}
+            E os coeficientes $a_{i}$, $c_{i}$ e $d_{i}$ , onde i indica a i-ésima linha da matriz A, são nulos, exceto nas condições expressas abaixo:\\
+            \begin{equation}
+                \begin{cases}
+                    d_{i} = (h^2-2), i \in [1,n-1]\\ \\
+                    c_{i} = \left(1+\frac{ih^2}{2} \right), i\in[1,n-2]\\ \\
+                    a_{i} = \left(1-\frac{ih^2}{2} \right), i\in[2,n-1]
+                \end{cases}
+            \end{equation}
+
+        \paragraph{}
+            Resolvendo o sistema de equações (5) para um determinado valor de $h$ obtemos uma aproximação da solução analítica da EDO (1), com erro menor que $h^2$.
+
+        \subsection{Algoritmo Utilizado}
+            A função implementada no arquivo dif.m (anexada a esse trabalho) possui o seguinte funcionamento:\\
+
+            \subsubsection{Entrada:}
+            \begin{itemize}
+                \item variável real (h) representando a precisão utilizada na resolução do PVC
+            \end{itemize}
+
+            \subsubsection{Saída:}
+            \begin{itemize}
+                \item matriz real ($S_{{n}\times{2}}$) contendo os pares ordenados $x$ e $f(x)$ do PVC no intervalo [0,1]
+            \end{itemize}
+
+            \subsubsection{Funcionamento:}
+            \begin{itemize}
+                \item Inicia todos os vetores e matrizes com valores nulos
+                \item Percorre as (n-1) linhas iterando sobre a matriz de coeficientes (M) e o vetor solução (B) preenchendo-os de acordo com os critérios das equações (5) e (6).
+                \item Resolve o sistema linear utilizando a função '\' do Octave para o vetor de incógnitas (X).
+                \item Copia os resultados de (X) para a segunda coluna de (S).
+                \item Retorna a matriz real ($S_{{n}\times{2}}$).
+            \end{itemize}
+
+
+\end{document}

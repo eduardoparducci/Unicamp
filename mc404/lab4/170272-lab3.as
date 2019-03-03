@@ -1,0 +1,45 @@
+# DEFINES
+.set END_1 0x3
+.set END_2 0x5
+
+# MEMORIA PARA VARIAVEIS
+.org 0x50
+X:   .wfill 1, 0x0
+Y:   .wfill 1, 0x1
+
+.org 0x3FD
+B:   .skip 0x1
+C:   .skip 0x1
+A:   .skip 0x1
+
+# MEMORIA DE PROGRAMA
+.org 0x0
+LOAD M(A)
+SUB M(Y)
+STOR M(A)
+
+laco:
+LOAD M(B)
+STA M(0x3,8:19)
+JUMP M(0x3,0:19)
+LOAD MQ,M(0X0)
+LOAD M(C)
+STA M(0x5,8:19)
+JUMP M(0x5,0:19)
+MUL M(0X0)
+LOAD MQ
+ADD M(X)
+STOR M(X)
+LOAD M(B)
+ADD M(Y)
+STOR M(B)
+LOAD M(C)
+ADD M(Y)
+STOR M(C)
+LOAD M(A)
+SUB M(Y)
+STOR M(A)
+JUMP+ M(laco,20:39)
+LOAD M(X)
+JUMP M(0x400,0:19)
+

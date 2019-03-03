@@ -1,0 +1,200 @@
+#include<stdio.h>
+#define HEIGHT 16
+#define LENGTH 32
+
+void print_map(char map[HEIGHT][LENGTH+1]);
+void copy_map(char original[HEIGHT][LENGTH+1], char copy[HEIGHT][LENGTH+1]);
+int build(char building[30][HEIGHT][LENGTH+1], int floor, int height, int pos_x, int pos_y);
+int path(char map[HEIGHT][LENGTH+1], int hole_x, int hole_y, int pos_x, int pos_y);
+
+int main(void){
+
+  int floors,pos_x,pos_y,i,j;
+  char building[30][HEIGHT][LENGTH+1];
+
+  /* Recebe numero de andares */
+  scanf("%d\n", &floors);
+
+  /* Recebe dados dos mapas */
+  for(j=0 ; j<=floors ; j++){
+    for(i=0 ; i<HEIGHT ; i++){
+      scanf(" %[^\n]s", building[floors-j][i]);
+    }
+  }
+  
+  /* Procura posicao atual */
+  for(i=0 ; i<HEIGHT ; i++){
+    for(j=0 ; j<LENGTH ; j++){
+      if(building[floors][i][j]=='X'){
+	pos_y=i;
+        pos_x=j;
+      }
+    }
+  }
+  
+  /* Inicia o processamento do último andar */ 
+  build(building,floors,floors,pos_x,pos_y);
+  
+  return 0;
+}
+
+void print_map(char map[HEIGHT][LENGTH+1]){
+
+  int i,j;
+
+  printf("\n");
+  for (i = 0; i < HEIGHT; i++) {
+    for (j = 0; j < LENGTH; j++) {
+      printf("%c", map[i][j]);
+    }
+    printf("\n");
+  }
+  printf("\n");
+  
+}
+
+int build(char building[30][HEIGHT][LENGTH+1], int floor, int height, int pos_x, int pos_y){
+
+  char map_copy[HEIGHT][LENGTH+1];
+  int a_x, a_y, b_x, b_y, e_x, e_y;
+  int i,j;
+
+  /* Inicia valores -1 para as coordenadas dos buracos */
+  a_x=a_y=b_x=b_y=-1;
+  
+  /* Critério de parada para recursão (nunca será executado) */
+  if(floor < 0){
+    return 0;
+  }
+
+  /* Cria uma cópia do mapa do andar atual */
+  copy_map(building[floor],map_copy);
+  
+  /* Verifica se está no térreo */
+  if(floor==0){
+
+    /* Procura posicao da porta E */
+    for(i=0 ; i<HEIGHT ; i++){
+      for(j=0 ; j<LENGTH ; j++){
+        if(map_copy[i][j]=='E'){  
+  	  e_y=i;
+          e_x=j;
+        }
+      }
+    }
+
+    /* Verifica se existe um caminho válido entre X e E*/
+    if(path(map_copy,e_x,e_y,pos_x,pos_y)){
+      printf("Terreo: Saida Encontrada\n");
+      return 1;
+    }
+    else{
+      return 0;
+    }
+  }
+    
+  /* Procura posicao do buraco A */
+  for(i=0 ; i<HEIGHT ; i++){
+    for(j=0 ; j<LENGTH ; j++){
+      if(map_copy[i][j]=='A'){
+	a_y=i;
+        a_x=j;
+      }
+    }
+  }
+  
+  /* Procura posicao do buraco B */
+  for(i=0 ; i<HEIGHT ; i++){
+    for(j=0 ; j<LENGTH ; j++){
+      if(map_copy[i][j]=='B'){
+	b_y=i;
+        b_x=j;
+      }
+    }
+  }
+    
+  /* Verifica se existe um caminho válido de X até A */
+  if(b_y!=-1)
+    map_copy[b_y][b_x] = '#';
+  if(path(map_copy,a_x,a_y,pos_x,pos_y)){
+    
+    /* Chama a função recursivamente para verificar os mesmos critérios no andar abaixo */
+    if(build(building,floor-1,height,a_x,a_y)){
+      printf("Andar %d: Passagem A\n", floor);
+      return 1;
+    }
+  }
+  
+  /* Verifica se existe um caminho válido de X até B */
+  copy_map(building[floor],map_copy);
+  if(a_y!=-1)
+    map_copy[a_y][a_x] = '#';
+  if(path(map_copy,b_x,b_y,pos_x,pos_y)){
+    
+    /* Chama a função recursivamente para verificar os mesmos critérios no andar abaixo */
+    if(build(building,floor-1,height,b_x,b_y)){
+      printf("Andar %d: Passagem B\n", floor);
+      return 1;
+    }
+  }
+
+  /* Retorno padrão da função (nunca será executado se houver uma saída válida) */
+  return 0;
+}
+
+int path(char map[HEIGHT][LENGTH+1], int hole_x, int hole_y, int pos_x, int pos_y){
+
+  /* Chegou à posição final */
+  if(pos_x==hole_x && pos_y==hole_y){
+    return 1;
+  }
+  
+  /* Encontrou uma borda */
+  if(map[pos_y][pos_x]=='#'){
+    return 0;
+  }
+  
+  /* Encontrou uma posição já visitada */
+  if(map[pos_y][pos_x]=='*'){
+    return 0;
+  }
+
+  /* Marca a posição atual */
+  if(map[pos_y][pos_x]==' ')
+    map[pos_y][pos_x] = '*';
+
+  /* Verifica recursivamente se pode se movimentar para norte */
+  if(path(map,hole_x,hole_y,pos_x,pos_y-1)){
+    return 1;
+  }
+
+  /* Verifica recursivamente se pode se movimentar para sul */
+  if(path(map,hole_x,hole_y,pos_x,pos_y+1)){
+    return 1;
+  }
+  
+  /* Verifica recursivamente se pode se movimentar para  leste*/
+  if(path(map,hole_x,hole_y,pos_x+1,pos_y)){
+    return 1;
+  }
+
+  /* Verifica recursivamente se pode se movimentar para oeste */
+  if(path(map,hole_x,hole_y,pos_x-1,pos_y)){
+    return 1;
+  }
+
+  /* Retorno padrão da função */
+  return 0;
+}
+
+void copy_map(char original[HEIGHT][LENGTH+1], char copy[HEIGHT][LENGTH+1]){
+
+  int i,j;
+
+  for(i=0 ; i<HEIGHT ; i++){
+    for(j=0 ; j<=LENGTH ; j++){
+      copy[i][j] = original[i][j];
+    }
+  }
+
+}

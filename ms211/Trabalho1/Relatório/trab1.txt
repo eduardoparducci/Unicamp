@@ -1,0 +1,20 @@
+MS211
+
+Imaginou-se um problema que consistia na linha de produção de uma fábrica de
+grande porte, a qual utiliza milhares de componentes para construir um produto.
+A matriz 1000x1000, portanto, seria composta pelo preço desses componentes, a fim
+de otimizar o lucro obtido pela empresa. Com essa contextualização, utilizou-se
+um programa para conseguir os dados iniciais, o qual funciona
+utilizando valores pseudo-randomicos para a solução do sistema e seus valores,
+pois Ax = B, sendo x e B valores determinados, pode-se gerar a matriz A, que
+respeita as condições de convergência. Como o objetivo era testar o desempenho
+das tecnicas de jacobi e seidel, os valores utilizados não eram "reais".
+  Ao rodar as duas tecnicas, verificou que o jacobi despende de um tempo inviavel
+para matrizes de ordem muito grande, o fato de atualizar as variaveis após
+o final da iteração, transforma o programa muito lento em grandes proporções.
+O seidel, no entanto, como ele atualiza as variaveis de acordo com o que ele
+encontra no meio da iteração, transforma a execução muito rápida e, assim, mais
+eficiente que o jacobi. Em comparação, seidel precisou de 6 iterações para
+alcançar o resultado, enquanto jacobi alcançou 500 e ainda não estava perto
+de convergir para a solução desejada. Conclui-se, portanto, que o seidel é mais
+eficiente computacionalmente para matrizes de grandes ordens.

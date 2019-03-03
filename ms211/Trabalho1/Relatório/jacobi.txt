@@ -1,0 +1,26 @@
+O código realiza os seguintes procedimentos:
+
+> inicia um vetor solução nulo 'x'
+> determina o erro como 0.0001
+> determina o vetor auxiliar para salvar o resultado da iteração anterior
+> determina uma variavel 'continua' como controle de laço, para verificar se convergiu
+> determina uma variavel contadora para o numero de iterações 'k'
+
+>cria um laço enquanto 'continua' for 'true'
+  >percorre as colunas e linhas
+    >se a linha(i) for diferente da coluna(j) ele realiza:
+      >>subtrai do auxiliar(i) o valor de A(i,j) multiplicado pelo x(j). [Ax = B]
+    >atualiza o auxiliar para o valor de auxiliar(i) mais B(i) dividido pelo A(i,i)
+  >termina a iteração
+
+  >verifica se o resultado ja convergiu
+    >>se tiver convergido, altera a variavel 'continua' para 'false'om
+    >>caso contrario, ela continua 'true'
+
+  >atualiza o vetor solução x para o mesmo valor do auxiliar, que são os resultados encontrados na ultima iteração
+
+  >soma uma iteração na variavel 'k' contadora
+
+  >repete o laço caso 'continua' for 'true' e encerra caso for 'false'
+
+>o resultado pode ser visualizado na tela retirando as barras de comentario %{ %} da ultima parte

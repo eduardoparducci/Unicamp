@@ -1,0 +1,11 @@
+# Books PDFs
+bibliografia/
+# My Student Documents
+documentos/
+# Non source files
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.in
+*.out
